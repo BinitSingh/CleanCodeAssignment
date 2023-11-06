@@ -45,19 +45,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-     CoroutineScope(Dispatchers.IO).launch {
-         launch { println("SUMIT") }
-         launch { println("SUMIT") }
-         delay(1000)
-         launch { println("SUMIT") }
-     }
-
-     CoroutineScope(Dispatchers.IO).launch {
-            println("SUMIT")
-            println("SUMIT")
-            println("SUMIT")
-     }
-
         setContent {
             val toolbarTitle = remember { mutableStateOf("") }
             val secondaryScreenHeader = remember { mutableStateOf(false) }
