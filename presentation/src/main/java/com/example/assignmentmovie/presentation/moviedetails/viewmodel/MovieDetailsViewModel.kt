@@ -25,7 +25,7 @@ class MovieDetailsViewModel @Inject constructor(
 
     fun getMovieDetails(movieId: Int) {
         viewModelScope.launch {
-            movieDetailsUseCase(movieId).collect() {
+            movieDetailsUseCase(movieId).collect {
                 when (it) {
                     is Response.Error -> _movieDetailInfoStateFlow.value =
                         ViewState.Error(it.message)
