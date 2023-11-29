@@ -1,0 +1,79 @@
+package com.assignment.movies.viewmodel
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.assignment.domain.modal.MovieListDomainModel
+import com.assignment.domain.usecase.MovieListUseCase
+import com.assignment.domain.utils.Result
+import com.assignment.movies.core.CoroutineRule
+import com.assignment.movies.ui.UiEvent
+import com.assignment.movies.ui.list.viewModel.MovieListState
+import com.assignment.movies.ui.list.viewModel.MoviesListViewModel
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TestRule
+import java.net.UnknownHostException
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class MovieListDomainModelViewModelTest {
+
+    @get:Rule
+    val testInstantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val coroutineRule = CoroutineRule()
+
+    private val movieListUseCase: MovieListUseCase = mockk()
+
+    private lateinit var viewModel: MoviesListViewModel
+
+    companion object {
+        private const val EMPTY_LIST = "Empty list"
+        private const val EXCEPTION_MSG = "unknown-host exception"
+    }
+
+    @Before
+    fun setUp() {
+        viewModel = MoviesListViewModel(movieListUseCase)
+    }
+
+    @Test
+    fun `fetch movie detail loading success test`() {
+        coEvery {
+            movieListUseCase()
+        } returns Result.Success(MovieListDomainModel(results = emptyList()))
+
+        runTest {
+            viewModel.onEvent(UiEvent.InitState)
+            assert(viewModel.movieListState.value is MovieListState.OnMovieListSuccess)
+        }
+    }
+
+    @Test
+    fun `fetch movie detail error failure test`() {
+        coEvery {
+            movieListUseCase()
+        } returns Result.Error(errorMessage = EMPTY_LIST)
+
+        runTest {
+            viewModel.onEvent(UiEvent.InitState)
+            assert(viewModel.movieListState.value is MovieListState.OnMovieListFailure)
+        }
+    }
+
+    @Test
+    fun `fetch movie detail exception failure test`() {
+        coEvery {
+            movieListUseCase()
+        } returns Result.Exception(UnknownHostException(EXCEPTION_MSG))
+
+        runTest {
+            viewModel.onEvent(UiEvent.InitState)
+            assert(viewModel.movieListState.value is MovieListState.OnMovieListFailure)
+        }
+    }
+}

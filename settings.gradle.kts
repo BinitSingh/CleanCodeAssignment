@@ -1,3 +1,4 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
         google()
@@ -13,10 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AssignmentMovie"
-include(":app")
-include(":data")
-include(":domain")
-include(":common")
-include(":presentation")
-include(":di")
+rootProject.name = "MovieApp"
+include(":app", ":data", ":domain", ":feature:movie")

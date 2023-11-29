@@ -1,16 +1,15 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.example.assignmentmovie.domain"
+    namespace = "com.assignment.domain"
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -21,31 +20,27 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":common")))
+    implementation(libs.core.ktx)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation)
 
-//    Hilt
-    api(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-
-    implementation(libs.appcompat)
-    implementation(libs.material)
-
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.junit)
+    testImplementation(libs.test.mock)
+    testImplementation(libs.test.coroutines)
+    testImplementation(libs.test.core)
 }

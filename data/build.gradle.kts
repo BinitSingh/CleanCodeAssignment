@@ -1,20 +1,32 @@
+import java.io.File
+import java.io.FileInputStream
+import java.util.Properties
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin("plugin.serialization") version embeddedKotlinVersion
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
-    namespace = "com.example.assignmentmovie.data"
+    namespace = "com.assignment.data"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "API_KEY", "\"ccf2b0dacee5aed1ebf2c301a0999ceb\"")
-        buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+
+        val prop = Properties().apply {
+            load(FileInputStream(File(rootProject.rootDir, "secure.properties")))
+        }
+        buildConfigField("String", "APIKEY", prop.getProperty("APIKEY"))
     }
 
     buildTypes {
@@ -22,35 +34,32 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = "17"
-    }
-    buildFeatures {
-        buildConfig = true
+        jvmTarget = libs.versions.jvmTarget.get()
     }
 }
 
 dependencies {
+    implementation(projects.domain)
+    implementation(libs.core.ktx)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.bundles.retrofit)
+    ksp(libs.moshi.codegen)
 
-    implementation(project(mapOf("path" to ":domain")))
-    implementation(project(mapOf("path" to ":common")))
-
-    // Retrofit
-    implementation(libs.squareup.retrofit)
-    api(libs.retrofit2.kotlinx.serialization.converter)
-    api(libs.kotlinx.serialization.json)
-    implementation(libs.okhttp)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
-    testImplementation(libs.okhttp)
-
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.junit)
+    testImplementation(libs.test.mock)
+    testImplementation(libs.test.coroutines)
+    testImplementation(libs.test.core)
 }

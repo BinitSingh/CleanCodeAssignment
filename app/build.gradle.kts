@@ -1,18 +1,19 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
-    namespace = "com.example.assignmentmovie"
+    namespace = "com.assignment.movie"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.assignmentmovie"
-        minSdk = 24
-        targetSdk = 33
+        applicationId = "com.assignment.movie"
+        minSdk = 26
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -24,25 +25,30 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+        }
+        debug {
+            isDebuggable = true
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = libs.versions.jvmTarget.get()
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
     packaging {
         resources {
@@ -52,25 +58,10 @@ android {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":presentation")))
-    implementation(project(mapOf("path" to ":data")))
-    implementation(project(mapOf("path" to ":di")))
-
-    //    Hilt
+    implementation(projects.domain)
+    implementation(projects.data)
+    implementation(projects.feature.movie)
     implementation(libs.hilt.android)
-
-    kapt(libs.hilt.android.compiler)
-
-
-    implementation(libs.activity.compose)
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.material3:material3")
-    implementation(libs.navigation.compose)
-
-    testImplementation(libs.junit)
-
-}
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
+    implementation(libs.hilt.navigation)
+    ksp(libs.hilt.compiler)
 }
